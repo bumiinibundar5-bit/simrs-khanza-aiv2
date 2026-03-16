@@ -2249,6 +2249,147 @@ private void ChkInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             param.put("logo",Sequel.cariGambar("select setting.logo from setting"));
             param.put("photo","http://"+koneksiDB.HOSTHYBRIDWEB()+":"+koneksiDB.PORTWEB()+"/"+koneksiDB.HYBRIDWEB()+"/penyerahanresep/"+Sequel.cariIsi("select bukti_penyerahan_resep_obat.photo from bukti_penyerahan_resep_obat where bukti_penyerahan_resep_obat.no_resep=?",NoResep.getText()));
             
+                        // =======================================================================
+            // *** MODIFIKASI OLEH : Claude AI — 2026-03-16 ***
+            // *** TUJUAN : Menambahkan data pasien lengkap ke dalam report           ***
+            // ***          Lembar Pemberian Obat 3 (rptLembarObat3.jasper)           ***
+            //
+            // Data yang ditambahkan :
+            //   1. Tgl Lahir  → param "tgllahir"    → tabel : pasien.tgl_lahir
+            //   2. Umur       → param "umurpasien"  → tabel : reg_periksa.umurdaftar + sttsumur
+            //   3. Jenis Kel. → param "jeniskelamin"→ tabel : pasien.jk  (L/P → teks)
+            //   4. Berat Badan→ param "beratbadan"  → tabel : pemeriksaan_ralan.berat
+            //                                          (fallback : pemeriksaan_ranap.berat)
+            //   5. Alamat     → param "alamatpasien"→ tabel : pasien.alamat
+            //   6. No.Telpon  → param "notlp"       → tabel : pasien.no_tlp
+            //
+            // CATATAN PENTING :
+            //   - Semua parameter ini juga harus dideklarasikan di rptLembarObat3.jrxml
+            //     (sudah dilakukan — lihat file jrxml yang dimodifikasi)
+            //   - Jika data kosong/null, nilai default yang ditampilkan adalah "-"
+            //   - Berat badan dicari dari ralan dulu; jika tidak ada, fallback ke ranap.
+            //     Ini agar mendukung pasien rawat jalan MAUPUN rawat inap.
+            // =======================================================================
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 1 : Ambil no_rkm_medis (nomor rekam medis) dari reg_periksa
+            //             menggunakan no_rawat yang sudah ada di field TNoRw.
+            //             no_rkm_medis ini menjadi kunci untuk semua query ke tabel pasien.
+            // Tabel  : reg_periksa
+            // Kolom  : no_rkm_medis  (relasi ke tabel pasien)
+            // -----------------------------------------------------------------------
+            String noRkmMedis = Sequel.cariIsi(
+                "select no_rkm_medis from reg_periksa where no_rawat=?",
+                TNoRw.getText());
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 2 : Ambil Tanggal Lahir
+            //             DATE_FORMAT mengubah format dari 'yyyy-MM-dd' (MySQL)
+            //             menjadi 'dd-MM-yyyy' agar tampil lebih natural di report.
+            //             Contoh hasil : "15-08-1990"
+            // Tabel  : pasien
+            // Kolom  : tgl_lahir (DATE)
+            // -----------------------------------------------------------------------
+            String tglLahir = Sequel.cariIsi(
+                "select DATE_FORMAT(tgl_lahir,'%d-%m-%Y') from pasien where no_rkm_medis=?",
+                noRkmMedis);
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 3 : Ambil Umur saat daftar
+            //             umurdaftar = angka umur (misal: 25)
+            //             sttsumur   = satuan : 'Th' (tahun), 'Bl' (bulan), 'Hr' (hari)
+            //             CONCAT menggabungkan keduanya. Contoh hasil : "25 Th"
+            // Tabel  : reg_periksa
+            // Kolom  : umurdaftar (INT), sttsumur (ENUM 'Th','Bl','Hr')
+            // -----------------------------------------------------------------------
+            String umurDaftar = Sequel.cariIsi(
+                "select CONCAT(umurdaftar,' ',sttsumur) from reg_periksa where no_rawat=?",
+                TNoRw.getText());
+            
+            // Masukkan tgl lahir dan umur ke parameter report
+            // Jika kosong (string ""), tampilkan "-"
+            param.put("tgllahir",   tglLahir.equals("")   ? "-" : tglLahir);
+            param.put("umurpasien", umurDaftar.equals("") ? "-" : umurDaftar);
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 4 : Ambil Jenis Kelamin
+            //             Kolom pasien.jk bertipe ENUM dengan nilai 'L' atau 'P'
+            //             Kode mengkonversi menjadi teks yang lebih deskriptif.
+            // Tabel  : pasien
+            // Kolom  : jk (ENUM 'L','P')
+            // -----------------------------------------------------------------------
+            String jk = Sequel.cariIsi(
+                "select jk from pasien where no_rkm_medis=?",
+                noRkmMedis);
+            // Konversi nilai enum ke teks Indonesia
+            // 'L' → "Laki-laki",  'P' → "Perempuan",  lainnya → "-"
+            String jkLabel = jk.equals("L") ? "Laki-laki"
+                           : (jk.equals("P") ? "Perempuan" : "-");
+            param.put("jeniskelamin", jkLabel);
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 5 : Ambil Berat Badan
+            //             STRATEGI PENCARIAN (2 tahap) :
+            //
+            //             Tahap A — Cari di pemeriksaan_ralan (rawat jalan)
+            //                       Kondisi : berat tidak null DAN tidak kosong ('')
+            //                       Ambil data TERBARU (ORDER BY tgl+jam DESC, LIMIT 1)
+            //
+            //             Tahap B — Jika hasil Tahap A kosong, cari di pemeriksaan_ranap
+            //                       (rawat inap) dengan logika yang sama.
+            //
+            //             Ini memastikan berat badan dapat ditampilkan untuk KEDUA
+            //             jenis pasien (ralan dan ranap).
+            //
+            // Tabel A : pemeriksaan_ralan
+            // Tabel B : pemeriksaan_ranap
+            // Kolom   : berat (VARCHAR 5) — contoh nilai: "65", "12.5"
+            // -----------------------------------------------------------------------
+            String beratBadan = Sequel.cariIsi(
+                "select berat from pemeriksaan_ralan " +
+                "where no_rawat=? and berat is not null and berat<>'' " +
+                "order by tgl_perawatan desc, jam_rawat desc limit 1",
+                TNoRw.getText());
+            
+            if (beratBadan.equals("")) {
+                // Tahap B : fallback ke pemeriksaan_ranap
+                beratBadan = Sequel.cariIsi(
+                    "select berat from pemeriksaan_ranap " +
+                    "where no_rawat=? and berat is not null and berat<>'' " +
+                    "order by tgl_perawatan desc, jam_rawat desc limit 1",
+                    TNoRw.getText());
+            }
+            // Tambahkan satuan "kg" jika data ada, jika tidak tampilkan "-"
+            param.put("beratbadan", beratBadan.equals("") ? "-" : beratBadan + " kg");
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 6 : Ambil Alamat Pasien
+            // Tabel  : pasien
+            // Kolom  : alamat (VARCHAR 200)
+            // -----------------------------------------------------------------------
+            String alamat = Sequel.cariIsi(
+                "select alamat from pasien where no_rkm_medis=?",
+                noRkmMedis);
+            param.put("alamatpasien", alamat.equals("") ? "-" : alamat);
+            
+            // -----------------------------------------------------------------------
+            // LANGKAH 7 : Ambil Nomor Telepon
+            // Tabel  : pasien
+            // Kolom  : no_tlp (VARCHAR 40)
+            // -----------------------------------------------------------------------
+            String noTlp = Sequel.cariIsi(
+                "select no_tlp from pasien where no_rkm_medis=?",
+                noRkmMedis);
+            param.put("notlp", noTlp.equals("") ? "-" : noTlp);
+            
+            // =======================================================================
+            // *** AKHIR MODIFIKASI ***
+            // Setelah blok ini, pemanggilan report dilanjutkan seperti semula.
+            // Semua parameter di atas (tgllahir, umurpasien, jeniskelamin,
+            // beratbadan, alamatpasien, notlp) sudah dideklarasikan di jrxml
+            // dan ditampilkan di section <title> pada report.
+            // =======================================================================
+
             Valid.MyReportqry("rptLembarObat3.jasper","report","::[ Lembar Pemberian Obat ]::","select * from temporary_resep where temporary_resep.temp37='"+akses.getalamatip()+"' order by temporary_resep.no",param);
             this.setCursor(Cursor.getDefaultCursor());
         }

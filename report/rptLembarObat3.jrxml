@@ -28,6 +28,24 @@
 	<parameter name="finger" class="java.lang.String"/>
 	<parameter name="photo" class="java.lang.String"/>
 	<parameter name="diserahkanoleh" class="java.lang.String"/>
+	<parameter name="tgllahir" class="java.lang.String">
+		<defaultValueExpression><![CDATA["-"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="umurpasien" class="java.lang.String">
+		<defaultValueExpression><![CDATA["-"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="jeniskelamin" class="java.lang.String">
+		<defaultValueExpression><![CDATA["-"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="beratbadan" class="java.lang.String">
+		<defaultValueExpression><![CDATA["-"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="alamatpasien" class="java.lang.String">
+		<defaultValueExpression><![CDATA["-"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="notlp" class="java.lang.String">
+		<defaultValueExpression><![CDATA["-"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[select * from temporary_resep]]>
 	</queryString>
@@ -190,7 +208,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="133" splitType="Stretch">
+		<band height="183" splitType="Stretch">
 			<textField>
 				<reportElement x="48" y="14" width="229" height="14" uuid="31498202-9007-4a25-814a-401a5c13ac09"/>
 				<textElement textAlignment="Center">
@@ -330,7 +348,7 @@
 				<text><![CDATA[No. Rawat]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="106" y="112" width="65" height="19" uuid="23d77141-2d57-4ccb-ba7c-01397c0cc3be"/>
+				<reportElement mode="Transparent" x="106" y="157" width="65" height="19" uuid="23d77141-2d57-4ccb-ba7c-01397c0cc3be"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font fontName="Tahoma" size="10" isBold="true"/>
 					<paragraph lineSpacing="Single"/>
@@ -338,49 +356,172 @@
 				<text><![CDATA[RESEP]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="64" y="54" width="126" height="9" uuid="999600e0-6804-4ddf-a931-8e67594bda3b"/>
+				<reportElement x="64" y="54" width="213" height="9" uuid="999600e0-6804-4ddf-a931-8e67594bda3b"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{pasien}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="64" y="63" width="126" height="9" uuid="17668c28-f830-4241-ae32-63a60bf9b543"/>
+				<reportElement x="64" y="63" width="213" height="9" uuid="17668c28-f830-4241-ae32-63a60bf9b543"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{norm}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="64" y="72" width="126" height="9" uuid="f5720961-e55c-4bbc-91be-f98f363cf58e"/>
+				<reportElement x="64" y="72" width="213" height="9" uuid="f5720961-e55c-4bbc-91be-f98f363cf58e"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{norawat}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="64" y="90" width="126" height="9" uuid="a4dd6735-384f-405f-a22a-a1b6ead62a69"/>
+				<reportElement x="64" y="90" width="213" height="9" uuid="a4dd6735-384f-405f-a22a-a1b6ead62a69"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{peresep}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="64" y="81" width="126" height="9" uuid="61106c6f-5148-4067-b816-a0b0721ff315"/>
+				<reportElement x="64" y="81" width="213" height="9" uuid="61106c6f-5148-4067-b816-a0b0721ff315"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{penanggung}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="64" y="99" width="126" height="9" uuid="dae4002f-edd7-409b-94fb-f48a11113692"/>
+				<reportElement x="64" y="99" width="213" height="9" uuid="dae4002f-edd7-409b-94fb-f48a11113692"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{noresep}]]></textFieldExpression>
 			</textField>
+			<!-- ========== BARIS TAMBAHAN BARU ========== -->
+			<!-- Tgl Lahir / Umur -->
+			<staticText>
+				<reportElement mode="Transparent" x="2" y="108" width="57" height="9" uuid="aa001001-1111-1111-1111-000000000001"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Tgl. Lahir/Umur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="59" y="108" width="5" height="9" uuid="aa001001-1111-1111-1111-000000000002"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="64" y="108" width="213" height="9" uuid="aa001001-1111-1111-1111-000000000003"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tgllahir}+" / "+$P{umurpasien}]]></textFieldExpression>
+			</textField>
+			<!-- Jenis Kelamin -->
+			<staticText>
+				<reportElement mode="Transparent" x="2" y="117" width="57" height="9" uuid="aa001001-1111-1111-1111-000000000004"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Jenis Kelamin]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="59" y="117" width="5" height="9" uuid="aa001001-1111-1111-1111-000000000005"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="64" y="117" width="213" height="9" uuid="aa001001-1111-1111-1111-000000000006"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{jeniskelamin}]]></textFieldExpression>
+			</textField>
+			<!-- Berat Badan -->
+			<staticText>
+				<reportElement mode="Transparent" x="2" y="126" width="57" height="9" uuid="aa001001-1111-1111-1111-000000000007"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Berat Badan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="59" y="126" width="5" height="9" uuid="aa001001-1111-1111-1111-000000000008"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="64" y="126" width="213" height="9" uuid="aa001001-1111-1111-1111-000000000009"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{beratbadan}]]></textFieldExpression>
+			</textField>
+			<!-- Alamat -->
+			<staticText>
+				<reportElement mode="Transparent" x="2" y="135" width="57" height="9" uuid="aa001001-1111-1111-1111-000000000010"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="59" y="135" width="5" height="9" uuid="aa001001-1111-1111-1111-000000000011"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="64" y="135" width="213" height="9" uuid="aa001001-1111-1111-1111-000000000012"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{alamatpasien}]]></textFieldExpression>
+			</textField>
+			<!-- No. Telepon -->
+			<staticText>
+				<reportElement mode="Transparent" x="2" y="144" width="57" height="9" uuid="aa001001-1111-1111-1111-000000000013"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[No. Telepon]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="59" y="144" width="5" height="9" uuid="aa001001-1111-1111-1111-000000000014"/>
+				<textElement markup="none">
+					<font fontName="Tahoma" size="7"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="64" y="144" width="213" height="9" uuid="aa001001-1111-1111-1111-000000000015"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{notlp}]]></textFieldExpression>
+			</textField>
+			<!-- ========================================= -->
+			<!-- Garis pemisah sebelum judul RESEP -->
 			<line>
-				<reportElement x="0" y="110" width="277" height="1" uuid="45a268fe-4879-4414-b5a0-57b8c3821a33"/>
+				<reportElement x="0" y="155" width="277" height="1" uuid="45a268fe-4879-4414-b5a0-57b8c3821a33"/>
 				<graphicElement>
 					<pen lineWidth="2.0" lineStyle="Double"/>
 				</graphicElement>
