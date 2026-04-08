@@ -142,7 +142,7 @@ import rekammedis.RMPenilaianAwalMedisRalanPsikiatrik;
 import rekammedis.RMPenilaianAwalMedisRalanRehabMedik;
 import rekammedis.RMPenilaianAwalMedisRalanTHT;
 import rekammedis.RMPenilaianBayiBaruLahir;
-import rekammedis.RMPenilaianDerajatDehidrasi;
+/* import rekammedis.RMPenilaianDerajatDehidrasi; */
 import rekammedis.RMPenilaianDerajatDehidrasi2;
 import rekammedis.RMPenilaianFisioterapi;
 import rekammedis.RMPenilaianKorbanKekerasan;
@@ -10347,7 +10347,7 @@ private void BtnDataAlergiPasienActionPerformed(java.awt.event.ActionEvent evt) 
             this.setCursor(Cursor.getDefaultCursor());
         }
     }
-
+/* 
     private void BtnPenilaianDerajatDehidrasiActionPerformed(java.awt.event.ActionEvent evt) {
         if(TPasien.getText().trim().equals("")||TNoRw.getText().trim().equals("")){
             JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu dengan menklik data pada table...!!!");
@@ -10365,6 +10365,7 @@ private void BtnDataAlergiPasienActionPerformed(java.awt.event.ActionEvent evt) 
             this.setCursor(Cursor.getDefaultCursor());
         }
     }
+ */       
 // penilaianDehidrasi2tambahancustom 04032026
     private void BtnPenilaianDerajatDehidrasi2ActionPerformed(java.awt.event.ActionEvent evt) {
         if(TPasien.getText().trim().equals("")||TNoRw.getText().trim().equals("")){
@@ -11767,10 +11768,12 @@ private void BtnDataAlergiPasienActionPerformed(java.awt.event.ActionEvent evt) 
         if(akses.getcatatan_anestesi_sedasi()==true){
             tinggi=tinggi+24;
         }
+ /*        
         BtnPenilaianDerajatDehidrasi.setVisible(akses.getpenilaian_derajat_dehidrasi());
         if(akses.getpenilaian_derajat_dehidrasi()==true){
             tinggi=tinggi+24;
         }
+*/
         BtnPenilaianDerajatDehidrasi2.setVisible(akses.getpenilaian_derajat_dehidrasi2());
         if(akses.getpenilaian_derajat_dehidrasi2()==true){
             tinggi=tinggi+24;
@@ -13813,7 +13816,7 @@ public void bukaDariBookingOperasi(String norawat) {
         FormMenu.add(BtnPenilaianTambahanBunuhDiri);
         FormMenu.add(BtnPenilaianTambahanPerilakuKekerasan);
         FormMenu.add(BtnPenilaianTambahanMelarikanDiri);
-        FormMenu.add(BtnPenilaianDerajatDehidrasi);
+ /*      FormMenu.add(BtnPenilaianDerajatDehidrasi); */  
         FormMenu.add(BtnPenilaianDerajatDehidrasi2);
     }
 
