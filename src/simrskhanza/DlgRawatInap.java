@@ -10941,7 +10941,7 @@ private void BtnSuratPernyataanKronologisActionPerformed(java.awt.event.ActionEv
         FormMenu.add(BtnPenilaianTambahanBunuhDiri);
         FormMenu.add(BtnPenilaianTambahanPerilakuKekerasan);
         FormMenu.add(BtnPenilaianTambahanMelarikanDiri);
-     //   FormMenu.add(BtnPenilaianDerajatDehidrasi); //
+     // FormMenu.add(BtnPenilaianDerajatDehidrasi); // (modif by chatgpt) Pindahkan tombol Penilaian Derajat Dehidrasi ke bawah tombol Penilaian Derajat Dehidrasi 2 //
         FormMenu.add(BtnPenilaianDerajatDehidrasi2);
     }
 

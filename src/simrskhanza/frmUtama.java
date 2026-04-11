@@ -26910,13 +26910,6 @@ private void MnGantiPasswordBtnLogActionPerformed(java.awt.event.ActionEvent evt
                 Panelmenu.add(btnPenilaianPasienImunitasRendah);
                 jmlmenu++;
             }
-
-            
-            // [CUSTOM 09042026] btnPenilaianDerajatDehidrasi (bawaan) disembunyikan, digantikan Dehidrasi2
-            //  if(akses.getpenilaian_derajat_dehidrasi()==true){
-            //     Panelmenu.add(btnPenilaianDerajatDehidrasi);
-            //     jmlmenu++;
-            //  } 
         
             //dehidrasi2//
             if(akses.getpenilaian_derajat_dehidrasi()==true){
@@ -32386,14 +32379,6 @@ private void MnGantiPasswordBtnLogActionPerformed(java.awt.event.ActionEvent evt
             jmlmenu++;
         }
 
-
-
-        // [CUSTOM 09042026] btnPenilaianDerajatDehidrasi (bawaan) disembunyikan, digantikan Dehidrasi2
-        // if(akses.getpenilaian_derajat_dehidrasi()==true){
-        //    Panelmenu.add(btnPenilaianDerajatDehidrasi);
-        //   jmlmenu++;
-        //  }
-    
         //Dehidrasi//
         if(akses.getpenilaian_derajat_dehidrasi()==true){
         Panelmenu.add(btnPenilaianDerajatDehidrasi2);
@@ -39395,19 +39380,10 @@ private void MnGantiPasswordBtnLogActionPerformed(java.awt.event.ActionEvent evt
                 jmlmenu++;
             }
         }
-
-        // [CUSTOM 09042026] btnPenilaianDerajatDehidrasi (bawaan) disembunyikan, digantikan Dehidrasi2
-        //  if(akses.getpenilaian_derajat_dehidrasi()==true){
-        //     if(btnPenilaianDerajatDehidrasi.getText().toLowerCase().trim().contains(TCari.getText().toLowerCase().trim())){
-        //        Panelmenu.add(btnPenilaianDerajatDehidrasi);
-        //        jmlmenu++;
-        //   }
-        // }
-
-        //Dehidrasi/
+        //Dehidrasi// [CUSTOM 12042026] Diganti ke Dehidrasi2 - Dehidrasi lama disembunyikan
         if(akses.getpenilaian_derajat_dehidrasi()==true){
-        if(btnPenilaianDerajatDehidrasi.getText().toLowerCase().trim().contains(TCari.getText().toLowerCase().trim())){
-            Panelmenu.add(btnPenilaianDerajatDehidrasi);
+        if(btnPenilaianDerajatDehidrasi2.getText().toLowerCase().trim().contains(TCari.getText().toLowerCase().trim())){
+            Panelmenu.add(btnPenilaianDerajatDehidrasi2);
             jmlmenu++;
         }
      }
