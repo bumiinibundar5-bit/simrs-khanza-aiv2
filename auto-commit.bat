@@ -7,13 +7,9 @@ git add .
 
 git commit -m "auto backup commit"
 
-echo PUSH KE REPO LAMA (origin)
-git push origin main
-
-echo PUSH KE REPO BARU (rsmm)
-git push rsmm main
+git push
 
 echo ==============================
-echo SELESAI PUSH KE SEMUA REPO
+echo SELESAI PUSH KE GITHUB
 echo ==============================
 pause
