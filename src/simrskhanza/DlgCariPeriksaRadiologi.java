@@ -10,7 +10,7 @@ import fungsi.koneksiDB;
 import fungsi.sekuel;
 import fungsi.validasi;
 import fungsi.akses;
-import fungsi.akuntindakanradiologi; 
+import fungsi.akuntindakanradiologi;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -252,7 +252,7 @@ public class DlgCariPeriksaRadiologi extends javax.swing.JDialog {
         tbListDicom = new widget.Table();
         panelGlass7 = new widget.panelisi();
         btnDicom = new widget.Button();
-        btnACSN = new widget.Button();
+        btnDicomRouter = new widget.Button();
         PanelDataDicari = new widget.panelisi();
         label17 = new widget.Label();
         NoRawatDicari = new widget.Label();
@@ -1034,18 +1034,18 @@ public class DlgCariPeriksaRadiologi extends javax.swing.JDialog {
         });
         panelGlass7.add(btnDicom);
 
-        btnACSN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/item.png"))); // NOI18N
-        btnACSN.setMnemonic('T');
-        btnACSN.setText("Set ACSN");
-        btnACSN.setToolTipText("Alt+T");
-        btnACSN.setName("btnACSN"); // NOI18N
-        btnACSN.setPreferredSize(new java.awt.Dimension(150, 30));
-        btnACSN.addActionListener(new java.awt.event.ActionListener() {
+        btnDicomRouter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/save-16x16.png"))); // NOI18N
+        btnDicomRouter.setMnemonic('T');
+        btnDicomRouter.setText("Ke DICOMROUTER");
+        btnDicomRouter.setToolTipText("Alt+T");
+        btnDicomRouter.setName("btnDicomRouter"); // NOI18N
+        btnDicomRouter.setPreferredSize(new java.awt.Dimension(160, 30));
+        btnDicomRouter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnACSNActionPerformed(evt);
+                btnDicomRouterActionPerformed(evt);
             }
         });
-        panelGlass7.add(btnACSN);
+        panelGlass7.add(btnDicomRouter);
 
         FormOrthan.add(panelGlass7, java.awt.BorderLayout.PAGE_END);
 
@@ -2088,7 +2088,7 @@ private void tbDokterKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_
             if(tbListDicom.getSelectedRow()!= -1){
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 OrthancDICOM orthan=new OrthancDICOM(null,false);
-                orthan.setJudul("::[ DICOM Orthanc Pasien "+tbDokter.getValueAt(tbDokter.getSelectedRow(),1).toString()+", Series "+tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString()+" ]::",tbDokter.getValueAt(tbDokter.getSelectedRow(),0).toString().replaceAll("/","")+"_"+tbDokter.getValueAt(tbDokter.getSelectedRow(),1).toString().replaceAll(" ","_").replaceAll("/","").replaceAll(":","").replaceAll(",",""),tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString());
+                orthan.setJudul("::[ DICOM Orthanc Pasien "+tbDokter.getValueAt(tbDokter.getSelectedRow(),1).toString()+", Series "+tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString()+" ]::",tbDokter.getValueAt(tbDokter.getSelectedRow(),0).toString().replaceAll("/","")+"_"+tbDokter.getValueAt(tbDokter.getSelectedRow(),1).toString().replaceAll(" ","_").replaceAll("/","").replaceAll(":","").replaceAll(",",""),tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString(),tbListDicom.getValueAt(tbListDicom.getSelectedRow(),1).toString(),tbDokter.getValueAt(tbDokter.getSelectedRow(),0).toString());
                 try {
                     System.out.println("URL : "+koneksiDB.URLORTHANC()+":"+koneksiDB.PORTORTHANC()+"/web-viewer/app/viewer.html?series="+tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString());
                     orthan.loadURL(koneksiDB.URLORTHANC()+":"+koneksiDB.PORTORTHANC()+"/web-viewer/app/viewer.html?series="+tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString());
@@ -2189,65 +2189,21 @@ private void tbDokterKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_
         } 
     }//GEN-LAST:event_formWindowOpened
 
-    private void btnACSNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnACSNActionPerformed
-        if(tbListDicom.getSelectedRow() != -1){
-
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-            try{
-                ApiOrthanc api = new ApiOrthanc();
-
-                // ✅ langsung ambil dari tabel (lebih cepat)
-                String studyId = tbListDicom.getValueAt(tbListDicom.getSelectedRow(),1).toString();
-
-                System.out.println("Study ID : " + studyId);
-
-                if(studyId.equals("")){
-                    JOptionPane.showMessageDialog(null,"Study tidak ditemukan..!!");
-                    return;
-                }
-
-                // ambil waktu dari Orthanc
-                String[] waktu = api.AmbilWaktuStudy(studyId);
-                String waktuDicom = api.formatWaktuDICOM(waktu[0], waktu[1]);
-
-                System.out.println("Waktu DICOM : " + waktuDicom);
-
-                if(waktuDicom.equals("")){
-                    JOptionPane.showMessageDialog(null,"Waktu DICOM tidak valid..!!");
-                    return;
-                }
-
-                // ambil accession otomatis
-                String accessionBaru = getAccessionByWaktu(waktuDicom);
-
-                System.out.println("Accession Baru : " + accessionBaru);
-
-                if(accessionBaru.equals("")){
-                    JOptionPane.showMessageDialog(null,"Accession tidak ditemukan..!!");
-                    return;
-                }
-
-                // modify ke Orthanc
-                boolean sukses = api.UbahAccession(studyId, accessionBaru);
-
-                if(sukses){
-                    JOptionPane.showMessageDialog(null,"Accession berhasil sinkron..!!");
-                }else{
-                    JOptionPane.showMessageDialog(null,"Gagal update Accession..!!");
-                }
-
-            }catch(Exception e){
-                System.out.println("Error : "+e);
-                JOptionPane.showMessageDialog(null,"Terjadi kesalahan..!!");
+    private void btnDicomRouterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDicomRouterActionPerformed
+        if(tabModeDicom.getRowCount()==0){
+            JOptionPane.showMessageDialog(null,"Maaf, data sudah habis...!!!!");
+            TCari.requestFocus();
+        }else {
+            if(tbListDicom.getSelectedRow()!= -1){
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                ApiOrthanc orthanc=new ApiOrthanc();
+                orthanc.kirimKeModality(tbListDicom.getValueAt(tbListDicom.getSelectedRow(),2).toString());
+                this.setCursor(Cursor.getDefaultCursor());
+            }else{
+                JOptionPane.showMessageDialog(null,"Maaf, Silahkan pilih data..!!");
             }
-
-            this.setCursor(Cursor.getDefaultCursor());
-
-        }else{
-            JOptionPane.showMessageDialog(null,"Maaf, Silahkan pilih data..!!");
         }
-    }//GEN-LAST:event_btnACSNActionPerformed
+    }//GEN-LAST:event_btnDicomRouterActionPerformed
 
     /**
     * @param args the command line arguments
@@ -2316,10 +2272,10 @@ private void tbDokterKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_
     private widget.Label TglDicari;
     private widget.TextBox Umur;
     private javax.swing.JDialog WindowGantiDokterParamedis;
-    private widget.Button btnACSN;
     private widget.Button btnAmbilPhoto;
     private widget.Button btnAmbilPhoto1;
     private widget.Button btnDicom;
+    private widget.Button btnDicomRouter;
     private widget.Button btnDokter;
     private widget.Button btnDokterPj;
     private widget.Button btnPasien;
@@ -2733,70 +2689,6 @@ private void tbDokterKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_
                 }
             }
         }
-    }
-    
-private String getAccessionByWaktu(String waktuDicom){
-    try {
-
-            // =========================
-            // 1. AMBIL kd_jenis_prw
-            // =========================
-            String kdJenis = "";
-
-            ps = koneksi.prepareStatement(
-                "SELECT kd_jenis_prw " +
-                "FROM periksa_radiologi " +
-                "WHERE no_rawat=? " +
-                "ORDER BY ABS(TIMESTAMPDIFF(SECOND, " +
-                "CONCAT(tgl_periksa,' ',jam), ?)) ASC " +
-                "LIMIT 1"
-            );
-
-            ps.setString(1, tbDokter.getValueAt(tbDokter.getSelectedRow(),0).toString());
-            ps.setString(2, waktuDicom);
-
-            rs = ps.executeQuery();
-
-            if(rs.next()){
-                kdJenis = rs.getString("kd_jenis_prw");
-            } else {
-                return "";
-            }
-
-            System.out.println("kd_jenis_prw : " + kdJenis);
-
-            // =========================
-            // 2. AMBIL noorder
-            // =========================
-            ps = koneksi.prepareStatement(
-                "SELECT p.noorder " +
-                "FROM permintaan_radiologi p " +
-                "JOIN permintaan_pemeriksaan_radiologi d ON p.noorder = d.noorder " +
-                "WHERE p.no_rawat=? AND d.kd_jenis_prw=? " +
-                "ORDER BY ABS(TIMESTAMPDIFF(SECOND, " +
-                "CONCAT(p.tgl_permintaan,' ',p.jam_permintaan), ?)) ASC " +
-                "LIMIT 1"
-            );
-
-            ps.setString(1, tbDokter.getValueAt(tbDokter.getSelectedRow(),0).toString());
-            ps.setString(2, kdJenis);
-            ps.setString(3, waktuDicom);
-
-            rs = ps.executeQuery();
-
-            if(rs.next()){
-                String noorder = rs.getString("noorder").replaceAll("PR","");
-
-                System.out.println("noorder : " + noorder);
-
-                return noorder + kdJenis;
-            }
-
-        } catch(Exception e){
-            System.out.println("Notif Accession : "+e);
-        }
-
-        return "";
     }
     
     private void runBackground(Runnable task) {

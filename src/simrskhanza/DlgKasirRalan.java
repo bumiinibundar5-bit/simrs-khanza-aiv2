@@ -22,6 +22,7 @@ import bridging.BPJSSuratKontrol;
 import rekammedis.RMRiwayatKlaim;
 import bridging.CoronaPasien;
 import bridging.DlgDataTB;
+import bridging.DlgKirimICare;
 import bridging.ICareRiwayatPerawatan;
 import bridging.ICareRiwayatPerawatanFKTP;
 import permintaan.DlgBookingOperasi;
@@ -56,6 +57,7 @@ import java.awt.event.WindowListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -260,6 +262,7 @@ public final class DlgKasirRalan extends javax.swing.JDialog {
             Beban_Jasa_Menejemen_Tindakan_Ralan="",Utang_Jasa_Menejemen_Tindakan_Ralan="",tampildiagnosa="",finger="",norawatdipilih="",normdipilih="",
             variabel="";
     public DlgBilingRalan billing=new DlgBilingRalan(null,false);
+    public DlgKirimICare dlgKirimICare = new DlgKirimICare(null, false);
     private int i=0,pilihan=0,sudah=0,jmlparsial=0;
     public DlgKamarInap kamarinap=new DlgKamarInap(null,false);
     private DlgRawatJalan dlgrwjl2=new DlgRawatJalan(null,false);
@@ -267,6 +270,8 @@ public final class DlgKasirRalan extends javax.swing.JDialog {
     private boolean sukses=false;
     private Jurnal jur=new Jurnal();
     private double ttljmdokter=0,ttljmperawat=0,ttlkso=0,ttljasasarana=0,ttlbhp=0,ttlmenejemen=0,ttlpendapatan=0;
+    private widget.Button BtnInfo;
+    public DlgInformasi dlgInformasi = new DlgInformasi(null, false, "ralan");
 
     /** Creates new form DlgReg
      * @param parent
@@ -274,6 +279,7 @@ public final class DlgKasirRalan extends javax.swing.JDialog {
     public DlgKasirRalan(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        initComponentsCustom();   // ← TAMBAH BARIS INI
         initKasirRalan();
 
         this.setLocation(8,1);
@@ -657,6 +663,43 @@ public final class DlgKasirRalan extends javax.swing.JDialog {
         }
     }
     
+
+    //bangyus
+    private void initComponentsCustom() {
+        BtnInfo = new widget.Button();
+        BtnInfo.setMnemonic('K');
+        BtnInfo.setText("Info");
+        BtnInfo.setToolTipText("");
+        BtnInfo.setGlassColor(new java.awt.Color(102, 153, 255));
+        BtnInfo.setName("BtnInfo"); // NOI18N
+        BtnInfo.setPreferredSize(new java.awt.Dimension(50, 30));
+        BtnInfo.setVerifyInputWhenFocusTarget(false);
+
+        BtnInfo.addActionListener(this::BtnInfoActionPerformed);
+
+        javax.swing.GroupLayout panelGlass9Layout = new javax.swing.GroupLayout(panelGlass9);
+        panelGlass9.setLayout(panelGlass9Layout);
+
+        panelGlass9Layout.setHorizontalGroup(
+                panelGlass9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                panelGlass9Layout.createSequentialGroup()
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(BtnInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap())
+        );
+
+        panelGlass9Layout.setVerticalGroup(
+                panelGlass9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelGlass9Layout.createSequentialGroup()
+                                .addGap(9, 9, 9)
+                                .addComponent(BtnInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(3, 3, 3))
+        );
+
+    }
+
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -1057,6 +1100,7 @@ public final class DlgKasirRalan extends javax.swing.JDialog {
         jLabel10 = new widget.Label();
         LCount = new widget.Label();
         BtnPrint = new widget.Button();
+        BtnKirimICare = new widget.Button();
         BtnKeluar = new widget.Button();
         panelGlass7 = new widget.panelisi();
         jLabel14 = new widget.Label();
@@ -6508,6 +6552,20 @@ public final class DlgKasirRalan extends javax.swing.JDialog {
             }
         });
         panelGlass6.add(BtnPrint);
+
+        BtnKirimICare.setMnemonic('T');
+        BtnKirimICare.setToolTipText("");
+        BtnKirimICare.setGlassColor(new java.awt.Color(102, 204, 255));
+        BtnKirimICare.setLabel("Kirim Icare");
+        BtnKirimICare.setName("BtnKirimICare"); // NOI18N
+        BtnKirimICare.setVisible(false);
+        BtnKirimICare.setPreferredSize(new java.awt.Dimension(130, 30));
+        BtnKirimICare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnKirimICareActionPerformed(evt);
+            }
+        });
+        panelGlass6.add(BtnKirimICare);
 
         BtnKeluar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/exit.png"))); // NOI18N
         BtnKeluar.setMnemonic('K');
@@ -14164,12 +14222,46 @@ private void MnDataPemberianObatActionPerformed(java.awt.event.ActionEvent evt) 
         }
     }//GEN-LAST:event_BtnRiwayatKlaimActionPerformed
 
-
-
     private void BtnRiwayatKlaimKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BtnRiwayatKlaimKeyPressed
         // TODO add your handling code here:
     }//GEN-LAST:event_BtnRiwayatKlaimKeyPressed
     
+//bangyus
+    private void BtnInfoActionPerformed(java.awt.event.ActionEvent evt) {
+        dlgInformasi.setSize(500, 500);
+        dlgInformasi.setLocationRelativeTo(internalFrame1);
+        dlgInformasi.setVisible(true);
+    }
+
+        private void BtnKirimICareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnKirimICareActionPerformed
+
+        ArrayList<Object[]> listICare = new ArrayList<>();
+
+        int rowCount = tabModekasir.getRowCount();
+        String kodeDokter;
+        String noKartu;
+        for (int idx = 0; idx < rowCount; idx++) {
+            Object sep = tabModekasir.getValueAt(idx, 5);
+
+            if (sep != null) {
+                kodeDokter = Sequel.cariIsi("select maping_dokter_dpjpvclaim.kd_dokter_bpjs from maping_dokter_dpjpvclaim where maping_dokter_dpjpvclaim.kd_dokter=?", tabModekasir.getValueAt(idx, 0).toString());
+                noKartu = Sequel.cariIsi("select pasien.no_peserta from pasien where pasien.no_rkm_medis=?", tabModekasir.getValueAt(idx, 2).toString());
+
+                listICare.add(new Object[]{sep.toString(), noKartu, kodeDokter});
+            }
+        }
+
+        dlgKirimICare.setSize(500, 300);
+        dlgKirimICare.setLocationRelativeTo(internalFrame1);
+        dlgKirimICare.setListSEP(listICare);
+        dlgKirimICare.setVisible(true);
+    }//GEN-LAST:event_BtnKirimICareActionPerformed
+
+    private void BtnKirimICareKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BtnKirimICareKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_BtnKirimICareKeyPressed
+
+
     private void MnPenatalaksanaanTerapiOkupasiActionPerformed(java.awt.event.ActionEvent evt) {                                                      
         if(tabModekasir.getRowCount()==0){
             JOptionPane.showMessageDialog(null,"Maaf, table masih kosong...!!!!");
@@ -14955,6 +15047,7 @@ private void MnDataPemberianObatActionPerformed(java.awt.event.ActionEvent evt) 
     private widget.Button BtnKeluar;
     private widget.Button BtnKeluar2;
     private widget.Button BtnKeluar4;
+    private widget.Button BtnKirimICare;
     private widget.Button BtnPrint;
     private widget.Button BtnPrint2;
     private widget.Button BtnPrint5;
@@ -15749,6 +15842,7 @@ private void MnDataPemberianObatActionPerformed(java.awt.event.ActionEvent evt) 
         MnSkriningKankerKolorektal.setEnabled(akses.getskrining_kanker_kolorektal());
         MnSkriningDiabetesMelitus.setEnabled(akses.getskrining_diabetes_melitus());
         MnLaporanTindakan.setEnabled(akses.getlaporan_tindakan());
+        BtnKirimICare.setVisible(akses.getadmin());
         
         if(akses.getkode().equals("Admin Utama")){
             MnHapusData.setEnabled(true);
