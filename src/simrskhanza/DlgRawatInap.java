@@ -157,6 +157,7 @@ import rekammedis.RMSkriningNutrisiLansia;
 import rekammedis.RMTimeOutSebelumInsisi;
 import rekammedis.RMTransferPasienAntarRuang;
 import rekammedis.RMDataHandover;
+import rekammedis.RMPartografWHO;
 
 
 
@@ -1407,6 +1408,7 @@ public final class DlgRawatInap extends javax.swing.JDialog {
         BtnPenilaianTambahanBunuhDiri = new widget.Button();
         BtnPenilaianTambahanPerilakuKekerasan = new widget.Button();
         BtnPenilaianTambahanMelarikanDiri = new widget.Button();
+        BtnPartografWHO = new widget.Button();
 
         BagianRS.setEditable(false);
         BagianRS.setText("0");
@@ -4133,6 +4135,23 @@ public final class DlgRawatInap extends javax.swing.JDialog {
                 BtnCatatanPersalinanActionPerformed(evt);
             }
         });
+
+        BtnPartografWHO.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/item.png"))); // NOI18N
+        BtnPartografWHO.setText("Partograf WHO");
+        BtnPartografWHO.setFocusPainted(false);
+        BtnPartografWHO.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        BtnPartografWHO.setGlassColor(new java.awt.Color(255, 255, 255));
+        BtnPartografWHO.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        BtnPartografWHO.setMargin(new java.awt.Insets(1, 1, 1, 1));
+        BtnPartografWHO.setName("BtnPartografWHO"); // NOI18N
+        BtnPartografWHO.setPreferredSize(new java.awt.Dimension(190, 23));
+        BtnPartografWHO.setRoundRect(false);
+        BtnPartografWHO.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnPartografWHOActionPerformed(evt);
+            }
+        });
+
 
         BtnCatatan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/item.png"))); // NOI18N
         BtnCatatan.setText("Catatan Pasien");
@@ -8173,6 +8192,25 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
         }
     }//GEN-LAST:event_BtnCatatanPersalinanActionPerformed
 
+    private void BtnPartografWHOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnPartografWHOActionPerformed
+        if(TNoRw.getText().trim().equals("")){
+            JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu dengan menklik data pada table...!!!");
+            TCari.requestFocus();
+        }else{
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            RMPartografWHO form=new RMPartografWHO(null,false);
+            form.isCek();
+            form.setSize(internalFrame1.getWidth()-20,internalFrame1.getHeight()-20);
+            form.setLocationRelativeTo(internalFrame1);
+            form.setVisible(true);
+            form.emptTeks();
+            form.setNoRm(TNoRw.getText(),DTPCari2.getDate());
+            form.tampil();
+            this.setCursor(Cursor.getDefaultCursor());
+        }
+    }//GEN-LAST:event_BtnPartografWHOActionPerformed
+
+
     private void BtnSkorAldrettePascaAnestesiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSkorAldrettePascaAnestesiActionPerformed
         if(TPasien.getText().trim().equals("")||TNoRw.getText().trim().equals("")){
             JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu dengan menklik data pada table...!!!");
@@ -8879,6 +8917,7 @@ private void BtnSuratPernyataanKronologisActionPerformed(java.awt.event.ActionEv
     private widget.Button BtnCatatanObservasiRanapKebidanan;
     private widget.Button BtnCatatanObservasiRanapPostPartum;
     private widget.Button BtnCatatanPersalinan;
+    private widget.Button BtnPartografWHO;
     private widget.Button BtnChecklistKriteriaKeluarHCU;
     private widget.Button BtnChecklistKriteriaKeluarICU;
     private widget.Button BtnChecklistKriteriaMasukHCU;
@@ -9915,11 +9954,16 @@ private void BtnSuratPernyataanKronologisActionPerformed(java.awt.event.ActionEv
             tinggi = tinggi + 24;
         }
 
-
         BtnCatatanPersalinan.setVisible(akses.getcatatan_persalinan());
         if(akses.getcatatan_persalinan()==true){
             tinggi=tinggi+24;
         }
+
+        BtnPartografWHO.setVisible(akses.getpartograf_who());
+        if(akses.getpartograf_who()==true){
+            tinggi=tinggi+24;
+        }
+
         BtnSkorAldrettePascaAnestesi.setVisible(akses.getskor_aldrette_pasca_anestesi());
         if(akses.getskor_aldrette_pasca_anestesi()==true){
             tinggi=tinggi+24;
@@ -10896,6 +10940,7 @@ private void BtnSuratPernyataanKronologisActionPerformed(java.awt.event.ActionEv
         FormMenu.add(BtnDataAlergiPasien);
         FormMenu.add(BtnSuratPernyataanKronologis);
         // (modif by chatgpt) Tambahkan tombol Laporan Tindakan Paru ke FormMenu //
+        FormMenu.add(BtnPartografWHO);
         FormMenu.add(BtnCatatan);
         FormMenu.add(BtnCatatanObservasiRanap);
         FormMenu.add(BtnCatatanObservasiRanapKebidanan);

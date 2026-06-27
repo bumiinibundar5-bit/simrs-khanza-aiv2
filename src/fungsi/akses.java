@@ -245,7 +245,7 @@ public final class akses {
             layanan_program_kfr=false,skrining_hipertensi=false,skrining_kesehatan_penglihatan=false,catatan_observasi_hemodialisa=false,skrining_kesehatan_gigi_mulut_dewasa=false,
             skrining_risiko_kanker_serviks=false,catatan_cairan_hemodialisa=false,skrining_kesehatan_gigi_mulut_lansia=false,skrining_indra_pendengaran=false,
             catatan_pengkajian_paska_operasi=false,surat_pernyataan_kronologis=false,laporan_tindakan_paru=false,catatan_operasi_mata=false,hasil_pemeriksaan_spirometri=false,data_alergi_pasien=false,penilaian_derajat_dehidrasi2=false,pemeriksaan_eeg=false,observasi_pasien_dialisis=false,satu_sehat_kirim_imagestudy_radiologi=false,satu_sehat_kirim_allergyintolerance=false,satu_sehat_kirim_allergy_intolerance=false,bridging_smart_klaim_bpjs=false,mapping_prosedur_smart_klaim_bpjs=false,
-            mapping_penyakit_smart_klaim_bpjs=false;;
+            mapping_penyakit_smart_klaim_bpjs=false,resume_pemakaian_ventilator=false,partograf_who=false;;
 
     public static void setData(String user, String pass) {
         try {
@@ -1400,6 +1400,9 @@ public final class akses {
                         akses.bridging_smart_klaim_bpjs=true;
                         akses.mapping_prosedur_smart_klaim_bpjs=true;
                         akses.mapping_penyakit_smart_klaim_bpjs=true;
+                        akses.resume_pemakaian_ventilator=true;
+                        akses.partograf_who=true;
+                        
                     }else if(rs2.getRow()>=1){
                         rs2.beforeFirst();
                         rs2.next();
@@ -2538,6 +2541,8 @@ public final class akses {
                         akses.bridging_smart_klaim_bpjs=rs2.getBoolean("bridging_smart_klaim_bpjs");
                         akses.mapping_prosedur_smart_klaim_bpjs=rs2.getBoolean("mapping_prosedur_smart_klaim_bpjs");
                         akses.mapping_penyakit_smart_klaim_bpjs=rs2.getBoolean("mapping_penyakit_smart_klaim_bpjs");
+                        akses.resume_pemakaian_ventilator=rs2.getBoolean("resume_pemakaian_ventilator");
+                        akses.partograf_who=rs2.getBoolean("partograf_who");
 
                     }else if((rs.getRow()==0)&&(rs2.getRow()==0)){
                         akses.kode="";
@@ -3675,6 +3680,8 @@ public final class akses {
                         akses.bridging_smart_klaim_bpjs=false;
                         akses.mapping_prosedur_smart_klaim_bpjs=false;
                         akses.mapping_penyakit_smart_klaim_bpjs=false;
+                        akses.resume_pemakaian_ventilator=false;
+                        akses.partograf_who=false;
                     }
                 } catch (Exception e) {
                     System.out.println("Notifikasi : "+e);
@@ -4830,6 +4837,8 @@ public final class akses {
         akses.observasi_pasien_dialisis=false;
         akses.satu_sehat_kirim_imagestudy_radiologi=false;
         akses.satu_sehat_kirim_allergyintolerance = false;
+        akses.resume_pemakaian_ventilator=false;
+        akses.partograf_who=false;
     }
 
     public static int getjml1() {return akses.jml1;}
@@ -6007,5 +6016,7 @@ public final class akses {
     public static boolean getbridging_smart_klaim_bpjs(){return akses.bridging_smart_klaim_bpjs;}
     public static boolean getmapping_prosedur_smart_klaim_bpjs(){return akses.mapping_prosedur_smart_klaim_bpjs;}
     public static boolean getmapping_penyakit_smart_klaim_bpjs(){return akses.mapping_penyakit_smart_klaim_bpjs;}
+    public static boolean getresume_pemakaian_ventilator(){return akses.resume_pemakaian_ventilator;}
+    public static boolean getpartograf_who(){return akses.partograf_who;}
 
 }

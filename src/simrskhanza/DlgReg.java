@@ -29,6 +29,7 @@ import surat.SuratKontrol;
 import bridging.InhealthDataSJP;
 import bridging.PCareDataPendaftaran;
 import bridging.SisruteRujukanKeluar;
+import bridging.ApiMobileJKN; // custom22062026
 import laporan.DlgDiagnosaPenyakit;
 import laporan.DlgFrekuensiPenyakitRalan;
 import keuangan.DlgBilingRalan;
@@ -44,6 +45,14 @@ import grafikanalisa.grafikperiksaperpoli;
 import grafikanalisa.grafikperiksapertahun;
 import grafikanalisa.grafiksql;
 import fungsi.koneksiDB;
+// custom22062026 - dependensi TaskID99 (Update Task ID Mobile JKN)
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import fungsi.sekuel;
 import fungsi.validasi;
 import fungsi.akses;
@@ -64,6 +73,7 @@ import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -264,6 +274,15 @@ public final class DlgReg extends javax.swing.JDialog {
             validasiregistrasi=Sequel.cariIsi("select set_validasi_registrasi.wajib_closing_kasir from set_validasi_registrasi"),
             validasicatatan=Sequel.cariIsi("select set_validasi_catatan.tampilkan_catatan from set_validasi_catatan"),norawatdipilih="",normdipilih="",variabel="";
     private SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
+    // custom22062026 - field pendukung TaskID99 (Update Task ID Mobile JKN BPJS)
+    private ApiMobileJKN apiMobileJKN = new ApiMobileJKN();
+    private ObjectMapper mapper = new ObjectMapper();
+    private HttpHeaders headers;
+    private HttpEntity requestEntity;
+    private JsonNode root;
+    private JsonNode nameNode;
+    private String URL="", utc="", requestJson="", respon="200";
+    // ===================== END field TaskID99 ==============================
     private char ESC = 27;
     // ganti kertas
     private char[] FORM_FEED = {12};
@@ -318,6 +337,7 @@ public final class DlgReg extends javax.swing.JDialog {
     public DlgReg(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        initComponentsExtra();           // custom22062026
         initSuratPernyataanKronologis(); // custom02092025
         initAlergiPasien();              // CATATAN 17-01-2026
         initRegistrasi();
@@ -7216,6 +7236,91 @@ public final class DlgReg extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // custom22062026 - Dipisah dari initComponents() karena method tersebut
+    // sudah melewati batas ukuran bytecode 64KB (error "code too large").
+    // Dipanggil manual dari constructor, tepat setelah initComponents().
+    private void initComponentsExtra() {
+        // --- Instansiasi objek komponen custom ---
+        Checkin = new widget.TextBox();
+        BookingJkn = new widget.TextBox();
+        BtnCheckin = new widget.Button();
+        BtnBatalCheckin = new widget.Button();
+        btnCopyNoKa = new widget.Button();
+        Btn99 = new widget.Button();
+        TStamp = new widget.TextBox();
+
+        // --- Status Checkin & Booking Mobile JKN BPJS (panelGlass8) ---
+        Checkin.setEditable(false);
+        Checkin.setName("Checkin"); // NOI18N
+        Checkin.setPreferredSize(new java.awt.Dimension(60, 23));
+        panelGlass8.add(Checkin);
+
+        BookingJkn.setEditable(false);
+        BookingJkn.setName("BookingJkn"); // NOI18N
+        BookingJkn.setPreferredSize(new java.awt.Dimension(110, 23));
+        panelGlass8.add(BookingJkn);
+
+        BtnCheckin.setText("Checkin");
+        BtnCheckin.setToolTipText("Checkin Antrean Mobile JKN");
+        BtnCheckin.setName("BtnCheckin"); // NOI18N
+        BtnCheckin.setPreferredSize(new java.awt.Dimension(90, 30));
+        BtnCheckin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnCheckinActionPerformed(evt);
+            }
+        });
+        panelGlass8.add(BtnCheckin);
+
+        BtnBatalCheckin.setText("Batal");
+        BtnBatalCheckin.setToolTipText("Batalkan Checkin Antrean Mobile JKN");
+        BtnBatalCheckin.setName("BtnBatalCheckin"); // NOI18N
+        BtnBatalCheckin.setPreferredSize(new java.awt.Dimension(80, 30));
+        BtnBatalCheckin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnBatalCheckinActionPerformed(evt);
+            }
+        });
+        panelGlass8.add(BtnBatalCheckin);
+
+        panelGlass8.revalidate();
+        panelGlass8.repaint();
+
+        // --- Tombol Copy No. Kartu JKN (FormInput) ---
+        btnCopyNoKa.setText("C");
+        btnCopyNoKa.setMnemonic('3');
+        btnCopyNoKa.setToolTipText("Copy No. Kartu JKN (Alt+3)");
+        btnCopyNoKa.setName("btnCopyNoKa"); // NOI18N
+        btnCopyNoKa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCopyNoKaActionPerformed(evt);
+            }
+        });
+        FormInput.add(btnCopyNoKa);
+        btnCopyNoKa.setBounds(882, 102, 28, 23);
+
+        // --- Tombol Update Task ID Mobile JKN (Btn99) ---
+        Btn99.setText("99");
+        Btn99.setToolTipText("Update Task ID Mobile JKN (lapor perubahan jadwal dokter)");
+        Btn99.setName("Btn99"); // NOI18N
+        Btn99.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Btn99ActionPerformed(evt);
+            }
+        });
+        FormInput.add(Btn99);
+        Btn99.setBounds(400, 72, 35, 23);
+
+        // TStamp disembunyikan, hanya menyimpan nilai timestamp epoch
+        TStamp.setName("TStamp"); // NOI18N
+        TStamp.setVisible(false);
+        FormInput.add(TStamp);
+        TStamp.setBounds(400, 102, 1, 1);
+
+        FormInput.revalidate();
+        FormInput.repaint();
+    }
+    // ===================== END initComponentsExtra ==============================
+
     private void TNoRwKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TNoRwKeyPressed
         Valid.pindah(evt,TNoReg,DTPReg);
 }//GEN-LAST:event_TNoRwKeyPressed
@@ -12117,6 +12222,98 @@ private void MnLaporanRekapKunjunganBulananPoliActionPerformed(java.awt.event.Ac
         }
     }//GEN-LAST:event_NoKaKeyPressed
 
+    // custom22062026 - Copy No. Kartu JKN ke clipboard
+    private void btnCopyNoKaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCopyNoKaActionPerformed
+        String text = NoKa.getText();
+        if (text == null || text.trim().equals("")) {
+            JOptionPane.showMessageDialog(null, "Maaf, No. Kartu JKN masih kosong...!!!");
+            NoKa.requestFocus();
+            return;
+        }
+        java.awt.datatransfer.StringSelection selection = new java.awt.datatransfer.StringSelection(text.trim());
+        java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
+        JOptionPane.showMessageDialog(null, "No. Kartu JKN berhasil dicopy");
+    }//GEN-LAST:event_btnCopyNoKaActionPerformed
+
+    // custom22062026 - Checkin Antrean Mobile JKN
+    private void BtnCheckinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCheckinActionPerformed
+        if (TNoRw.getText() == null || TNoRw.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(null, "Maaf, silahkan pilih data registrasi terlebih dahulu...!!!");
+            return;
+        }
+        Sequel.mengedit("referensi_mobilejkn_bpjs", "no_rawat=?", "status='Checkin',validasi=now()", 1,
+                new String[]{TNoRw.getText()});
+        Sequel.meghapus("referensi_mobilejkn_bpjs_batal", "nobooking", BookingJkn.getText());
+        Sequel.queryu("update reg_periksa set jam_reg=current_time() where no_rawat='" + TNoRw.getText() + "'");
+        getData();
+    }//GEN-LAST:event_BtnCheckinActionPerformed
+
+    // custom22062026 - Batalkan Checkin Antrean Mobile JKN
+    private void BtnBatalCheckinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnBatalCheckinActionPerformed
+        if (TNoRw.getText() == null || TNoRw.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(null, "Maaf, silahkan pilih data registrasi terlebih dahulu...!!!");
+            return;
+        }
+        Sequel.mengedit("referensi_mobilejkn_bpjs", "no_rawat=?", "status='Batal',validasi=now()", 1,
+                new String[]{TNoRw.getText()});
+        Sequel.queryu("update reg_periksa set jam_reg=current_time() where no_rawat='" + TNoRw.getText() + "'");
+        getData();
+    }//GEN-LAST:event_BtnBatalCheckinActionPerformed
+
+    // custom22062026 - Update Task ID Mobile JKN (lapor perubahan jadwal dokter ke BPJS)
+    private void Btn99ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Btn99ActionPerformed
+        if (TNoRw.getText() == null || TNoRw.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(null, "Maaf, silahkan pilih data registrasi terlebih dahulu...!!!");
+            return;
+        }
+        TaskID99();
+    }//GEN-LAST:event_Btn99ActionPerformed
+
+    // custom22062026 - Hitung timestamp epoch dari tanggal registrasi, disimpan di TStamp
+    private void getTimeStamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+        String dateString = DTPReg.getSelectedItem().toString();
+        try {
+            Date date = sdf.parse(dateString);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            Long stamplong = Long.valueOf(calendar.getTimeInMillis());
+            String stamp = Long.toString(stamplong.longValue());
+            TStamp.setText(stamp);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // custom22062026 - Kirim update Task ID ke API Mobile JKN BPJS
+    @SuppressWarnings("unchecked")
+    private void TaskID99() {
+        respon = "200";
+        getTimeStamp();
+        try {
+            headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("x-cons-id", koneksiDB.CONSIDAPIMOBILEJKN());
+            utc = String.valueOf(apiMobileJKN.GetUTCdatetimeAsString());
+            headers.add("x-timestamp", utc);
+            headers.add("x-signature", apiMobileJKN.getHmac(utc));
+            headers.add("user_key", koneksiDB.USERKEYAPIMOBILEJKN());
+            requestJson = "{\"kodebooking\": \"" + TNoRw.getText() + "\",\"keterangan\": \"Terjadi Perubahan Jadwal Dokter\"}";
+            System.out.println("JSON : " + requestJson + "\n");
+            requestEntity = new HttpEntity(requestJson, (MultiValueMap) headers);
+            URL = koneksiDB.URLAPIMOBILEJKN() + "/antrean/batal";
+            System.out.println("URL : " + URL);
+            root = mapper.readTree((String) apiMobileJKN.getRest().exchange(URL, HttpMethod.POST, requestEntity, String.class).getBody());
+            nameNode = root.path("metadata");
+            respon = nameNode.path("code").asText();
+            System.out.println("respon WS BPJS Update TaskID : " + nameNode.path("code").asText() + " " + nameNode.path("message").asText() + "\n");
+            JOptionPane.showMessageDialog(null, " Respon Update TaskID " + nameNode.path("code").asText() + " " + nameNode.path("message").asText());
+        } catch (Exception e) {
+            System.out.println("Notif Update TaskID : " + e);
+        }
+    }
+    // ===================== END ==============================
+
     private void MnBarcode2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MnBarcode2ActionPerformed
         if(TPasien.getText().trim().equals("")){
             JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu pasien...!!!");
@@ -15803,9 +16000,13 @@ private void MnLaporanRekapKunjunganBulananPoliActionPerformed(java.awt.event.Ac
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private widget.TextBox AsalRujukan;
+    private widget.TextBox BookingJkn;
+    private widget.Button Btn99;
     private widget.Button BtnAll;
     private widget.Button BtnBatal;
+    private widget.Button BtnBatalCheckin;
     private widget.Button BtnCari;
+    private widget.Button BtnCheckin;
     private widget.Button BtnDokter;
     private widget.Button BtnEdit;
     private widget.Button BtnHapus;
@@ -15823,6 +16024,7 @@ private void MnLaporanRekapKunjunganBulananPoliActionPerformed(java.awt.event.Ac
     private widget.Button BtnSeek5;
     private widget.Button BtnSimpan;
     private widget.Button BtnUnit;
+    private widget.TextBox Checkin;
     private widget.CekBox ChkInput;
     private widget.CekBox ChkJln;
     private widget.CekBox ChkTracker;
@@ -16123,9 +16325,11 @@ private void MnLaporanRekapKunjunganBulananPoliActionPerformed(java.awt.event.Ac
     private widget.TextBox TPasien;
     private widget.TextBox TPngJwb;
     private widget.TextBox TPoli;
+    private widget.TextBox TStamp;
     private widget.TextBox TStatus;
     private javax.swing.JTabbedPane TabRawat;
     private widget.Button btnCekBridging;
+    private widget.Button btnCopyNoKa;
     private widget.Button btnKab;
     private widget.Button btnKec;
     private widget.Button btnKel;
@@ -16408,6 +16612,9 @@ private void MnLaporanRekapKunjunganBulananPoliActionPerformed(java.awt.event.Ac
             Sequel.cariIsi("select rujuk_masuk.perujuk from rujuk_masuk where rujuk_masuk.no_rawat=?", AsalRujukan,tbPetugas.getValueAt(tbPetugas.getSelectedRow(),2).toString());
             TNoRw.setText(tbPetugas.getValueAt(tbPetugas.getSelectedRow(),2).toString());
             TNoReg.setText(tbPetugas.getValueAt(tbPetugas.getSelectedRow(),1).toString());
+            // custom22062026 - Status Checkin & No. Booking Mobile JKN
+            Checkin.setText(Sequel.cariIsi("select referensi_mobilejkn_bpjs.status from referensi_mobilejkn_bpjs where no_rawat=?", TNoRw.getText()));
+            BookingJkn.setText(Sequel.cariIsi("select referensi_mobilejkn_bpjs.nobooking from referensi_mobilejkn_bpjs where no_rawat=?", TNoRw.getText()));
         }
     }
 
